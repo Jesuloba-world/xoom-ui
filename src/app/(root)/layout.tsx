@@ -1,5 +1,20 @@
 import { ReactNode } from "react";
+import { onGetLogtoContext } from "@/lib/logto/functions";
+import { Protector } from "./protector";
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-	return <div>{children}</div>;
+export default async function RootLayout({
+	children,
+}: {
+	children: ReactNode;
+}) {
+	const session = await onGetLogtoContext();
+	return (
+		<div>
+			{session.isAuthenticated ? (
+				children
+			) : (
+				<Protector isAuthenticated={session.isAuthenticated} />
+			)}
+		</div>
+	);
 }

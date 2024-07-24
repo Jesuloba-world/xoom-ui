@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MobileNav } from "./mobileNav";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User } from "./avatar";
 
 export const Navbar = () => {
 	return (
@@ -18,7 +20,7 @@ export const Navbar = () => {
 				</p>
 			</Link>
 			<div className="flex justify-between gap-5">
-				{/* User Avatar - User management  */}
+				<User />
 				<MobileNav />
 			</div>
 		</nav>
