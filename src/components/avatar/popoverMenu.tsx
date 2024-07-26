@@ -16,6 +16,8 @@ import { UserManagementDialog } from "./dialog";
 export const PopoverMenu = ({ children }: { children: ReactNode }) => {
 	const { session, signOut } = useLogto();
 	const username = session.userInfo?.username;
+	const profileImage = session.userInfo?.picture;
+
 	return (
 		<Popover>
 			<PopoverTrigger>{children}</PopoverTrigger>
@@ -26,7 +28,10 @@ export const PopoverMenu = ({ children }: { children: ReactNode }) => {
 			>
 				<div className="flex flex-col gap-4">
 					<div className="flex px-5 gap-4">
-						<UserAvatar username={username} />
+						<UserAvatar
+							profileImage={profileImage}
+							username={username}
+						/>
 						<div className="flex flex-col gap-1">
 							<h6>{username}</h6>
 						</div>

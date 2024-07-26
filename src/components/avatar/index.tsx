@@ -1,15 +1,21 @@
+"use client";
+
 import { PopoverMenu } from "./popoverMenu";
 import { UserAvatar } from "./avatar";
 import { useLogto } from "@/lib/logto/hooks";
-import { onGetLogtoContext } from "@/lib/logto/functions";
 
-export const User = async () => {
-	const session = await onGetLogtoContext();
-	const username = session.claims?.username;
+export const User = () => {
+	const { session } = useLogto();
+	const username = session.userInfo?.username;
+	const profileImage = session.userInfo?.picture;
 
 	return (
 		<PopoverMenu>
-			<UserAvatar variant={"small"} username={username} />
+			<UserAvatar
+				variant={"small"}
+				profileImage={profileImage}
+				username={username}
+			/>
 		</PopoverMenu>
 	);
 };

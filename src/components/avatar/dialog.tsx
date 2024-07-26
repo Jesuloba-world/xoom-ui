@@ -12,6 +12,7 @@ export const UserManagementDialog = ({ children }: { children: ReactNode }) => {
 	const { session } = useLogto();
 	const username = session.userInfo?.username;
 	const email = session.userInfo?.email;
+	const profileImage = session.userInfo?.picture;
 
 	const [profileUpdate, setProfileUpdate] = useState(false);
 	const [usernameUpdate, setUsernameUpdate] = useState(false);
@@ -28,7 +29,10 @@ export const UserManagementDialog = ({ children }: { children: ReactNode }) => {
 						</div>
 						{!profileUpdate ? (
 							<div className="flex items-center justify-between">
-								<UserAvatar username={username} />
+								<UserAvatar
+									profileImage={profileImage}
+									username={username}
+								/>
 								<Button
 									onClick={() => setProfileUpdate(true)}
 									variant={"link"}
@@ -38,6 +42,7 @@ export const UserManagementDialog = ({ children }: { children: ReactNode }) => {
 							</div>
 						) : (
 							<UpdateProfile
+								profileImage={profileImage}
 								username={username}
 								cancel={() => setProfileUpdate(false)}
 							/>
