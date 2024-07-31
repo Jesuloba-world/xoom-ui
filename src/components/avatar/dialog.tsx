@@ -7,15 +7,16 @@ import { UserAvatar } from "./avatar";
 import { Button } from "../ui/button";
 import { UpdateProfile } from "./updateProfile";
 import { UpdateUsername } from "./updateUsername";
+import { UpdateEmail } from "./updateEmail";
 
 export const UserManagementDialog = ({ children }: { children: ReactNode }) => {
 	const { session } = useLogto();
 	const username = session.userInfo?.username;
-	const email = session.userInfo?.email;
 	const profileImage = session.userInfo?.picture;
 
 	const [profileUpdate, setProfileUpdate] = useState(false);
 	const [usernameUpdate, setUsernameUpdate] = useState(false);
+	const [emailUpdate, setEmailUpdate] = useState(false);
 
 	return (
 		<Dialog>
@@ -66,15 +67,25 @@ export const UserManagementDialog = ({ children }: { children: ReactNode }) => {
 								cancel={() => setUsernameUpdate(false)}
 							/>
 						)}
-						<div>
+						{/* <div>
 							<p>Email address:</p>
 						</div>
-						<div className="flex items-center justify-between">
-							<p>{email}</p>
-							<Button variant={"link"}>
-								{email ? "update" : "add"} email
-							</Button>
-						</div>
+						{!emailUpdate ? (
+							<div className="flex items-center justify-between">
+								<p>{email}</p>
+								<Button
+									variant={"link"}
+									onClick={() => setEmailUpdate(true)}
+								>
+									{email ? "update" : "add"} email
+								</Button>
+							</div>
+						) : (
+							<UpdateEmail
+								cancel={() => setEmailUpdate(false)}
+								email={email}
+							/>
+						)} */}
 					</div>
 				</div>
 			</DialogContent>

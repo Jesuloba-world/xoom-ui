@@ -65,7 +65,10 @@ export const UpdateProfile = ({
 	};
 
 	function onSubmit(values: z.infer<typeof profileImageSchema>) {
-		// mutate(values.file);
+		if (values.file === null && previewUrl === profileImage) {
+			cancel();
+			return;
+		}
 
 		const formData = new FormData();
 		formData.append("image", values.file || "nil");
@@ -73,6 +76,9 @@ export const UpdateProfile = ({
 		mutate(formData, {
 			onSettled() {
 				cancel();
+			},
+			onError(err) {
+				console.log(err);
 			},
 		});
 	}
