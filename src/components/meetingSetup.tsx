@@ -1,30 +1,14 @@
 import { useEffect, useRef } from "react";
 import { Switch } from "./ui/switch";
+import { useMeeting } from "@/context/meetingContext";
 
-export interface meetingProps {
-	stream: MediaStream | null;
-	isAudioEnabled: boolean;
-	isVideoEnabled: boolean;
-	toggleVideo: () => void;
-	toggleAudio: () => void;
-}
+export interface meetingProps {}
 
 export interface meetingSetupProps extends meetingProps {}
 
-export const MeetingSetup = ({
-	stream,
-	isVideoEnabled,
-	isAudioEnabled,
-	toggleAudio,
-	toggleVideo,
-}: meetingSetupProps) => {
-	const videoRef = useRef<HTMLVideoElement>(null);
-
-	useEffect(() => {
-		if (videoRef.current && stream) {
-			videoRef.current.srcObject = stream;
-		}
-	}, [stream]);
+export const MeetingSetup = ({}: meetingSetupProps) => {
+	const { isAudioEnabled, isVideoEnabled, stream, toggleAudio, toggleVideo } =
+		useMeeting();
 
 	return (
 		<div className="flex h-screen w-full flex-col items-center justify-center gap-3 text-white">
@@ -32,7 +16,9 @@ export const MeetingSetup = ({
 			<div>
 				{isVideoEnabled && stream ? (
 					<video
-						ref={videoRef}
+						ref={(videoElement) => {
+							if (videoElement) videoElement.srcObject = stream;
+						}}
 						autoPlay
 						playsInline
 						muted
