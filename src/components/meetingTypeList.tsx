@@ -4,6 +4,8 @@ import { HomeCard } from "./homeCard";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MeetingModal } from "./meetingModal";
+import { useCreateInstantMeeting } from "@/api/meeting/hooks";
+import { useToast } from "./ui/use-toast";
 
 export const MeetingTypeList = () => {
 	const [meetingState, setMeetingState] = useState<
@@ -13,9 +15,30 @@ export const MeetingTypeList = () => {
 		| undefined
 	>();
 
+	const { toast } = useToast();
 	const router = useRouter();
+	const { mutate, isPending } = useCreateInstantMeeting();
 
-	const createMeeting = () => {};
+	const createMeeting = () => {
+		mutate(
+			{},
+			{
+				onSuccess: (data) => {
+					router.push(`/meeting/${data.data.meeting_id}`);
+					toast({
+						title: "Meeting created",
+					});
+				},
+				onError: (err) => {
+					toast({
+						title: "Failed to create meeting",
+						description: err.message,
+						variant: "destructive",
+					});
+				},
+			}
+		);
+	};
 
 	const cards = [
 		{
@@ -67,6 +90,7 @@ export const MeetingTypeList = () => {
 				className="text-center"
 				buttonText={"Start Meeting"}
 				handleClick={createMeeting}
+				isPending={isPending}
 			/>
 		</section>
 	);

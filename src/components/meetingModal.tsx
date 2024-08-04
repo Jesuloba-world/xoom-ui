@@ -21,6 +21,7 @@ interface MeetingModalProps {
 	children?: ReactNode;
 	image?: string;
 	buttonIcon?: string;
+	isPending: boolean;
 }
 
 export const MeetingModal = ({
@@ -33,6 +34,7 @@ export const MeetingModal = ({
 	image,
 	children,
 	buttonIcon,
+	isPending,
 }: MeetingModalProps) => {
 	return (
 		<Dialog
@@ -65,6 +67,7 @@ export const MeetingModal = ({
 					<Button
 						className="bg-blue-1 focus-visible:ring-0 focus-visible:ring-offset-0"
 						onClick={handleClick}
+						isProcessing={isPending}
 					>
 						{buttonIcon && (
 							<Image
