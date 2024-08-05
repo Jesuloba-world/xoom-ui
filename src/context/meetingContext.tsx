@@ -15,8 +15,6 @@ interface MeetingContextType {
 	isAudioEnabled: boolean;
 	toggleVideo: () => void;
 	toggleAudio: () => void;
-	videoStream: MediaStream | null;
-	audioStream: MediaStream | null;
 	stream: MediaStream | null;
 }
 
@@ -25,8 +23,6 @@ const MeetingContext = createContext<MeetingContextType>({
 	isAudioEnabled: false,
 	toggleAudio: () => {},
 	toggleVideo: () => {},
-	audioStream: null,
-	videoStream: null,
 	stream: null,
 });
 
@@ -37,8 +33,6 @@ export const MeetingContextProvider = ({
 }) => {
 	const { toast } = useToast();
 
-	const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-	const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
 	const [stream, setStream] = useState<MediaStream | null>(null);
 	const [isVideoEnabled, setIsVideoEnabled] = useState(false);
 	const [isAudioEnabled, setIsAudioEnabled] = useState(false);
@@ -61,40 +55,59 @@ export const MeetingContextProvider = ({
 	);
 
 	const toggleAudio = useCallback(async () => {
-		if (audioStream) {
-			audioStream.getTracks().forEach((track) => track.stop());
-			setAudioStream(null);
+		if (isAudioEnabled) {
+			if (stream) {
+				const audioTracks = stream.getAudioTracks();
+				audioTracks.forEach((track) => {
+					track.stop();
+					stream.removeTrack(track);
+				});
+			}
 			setIsAudioEnabled(false);
 		} else {
-			const stream = await getMedia({ audio: true });
-			if (stream) {
-				setAudioStream(stream);
+			const audioStream = await getMedia({ audio: true });
+			if (audioStream) {
+				if (stream) {
+					audioStream
+						.getAudioTracks()
+						.forEach((track) => stream.addTrack(track));
+				} else {
+					setStream(audioStream);
+				}
 				setIsAudioEnabled(true);
 			}
 		}
-	}, [audioStream, getMedia]);
+	}, [getMedia, isAudioEnabled, stream]);
 
 	const toggleVideo = useCallback(async () => {
-		if (videoStream) {
-			videoStream.getTracks().forEach((track) => track.stop());
-			setVideoStream(null);
+		if (isVideoEnabled) {
+			if (stream) {
+				const videoTracks = stream.getVideoTracks();
+				videoTracks.forEach((track) => {
+					track.stop();
+					stream.removeTrack(track);
+				});
+			}
 			setIsVideoEnabled(false);
 		} else {
-			const stream = await getMedia({ video: true });
-			if (stream) {
-				setVideoStream(stream);
+			const videoStream = await getMedia({ video: true });
+			if (videoStream) {
+				if (stream) {
+					videoStream
+						.getVideoTracks()
+						.forEach((track) => stream.addTrack(track));
+				} else {
+					setStream(videoStream);
+				}
 				setIsVideoEnabled(true);
 			}
 		}
-	}, [videoStream, getMedia]);
+	}, [isVideoEnabled, stream, getMedia]);
 
 	useEffect(() => {
 		return () => {
-			if (audioStream) {
-				audioStream.getTracks().forEach((track) => track.stop());
-			}
-			if (videoStream) {
-				videoStream.getTracks().forEach((track) => track.stop());
+			if (stream) {
+				stream.getTracks().forEach((track) => track.stop());
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,8 +118,6 @@ export const MeetingContextProvider = ({
 		isAudioEnabled,
 		toggleAudio,
 		toggleVideo,
-		audioStream,
-		videoStream,
 		stream,
 	};
 
