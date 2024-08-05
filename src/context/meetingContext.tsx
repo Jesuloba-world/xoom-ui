@@ -13,17 +13,21 @@ import {
 interface MeetingContextType {
 	isVideoEnabled: boolean;
 	isAudioEnabled: boolean;
-	stream: MediaStream | null;
 	toggleVideo: () => void;
 	toggleAudio: () => void;
+	videoStream: MediaStream | null;
+	audioStream: MediaStream | null;
+	stream: MediaStream | null;
 }
 
 const MeetingContext = createContext<MeetingContextType>({
 	isVideoEnabled: false,
 	isAudioEnabled: false,
-	stream: null,
 	toggleAudio: () => {},
 	toggleVideo: () => {},
+	audioStream: null,
+	videoStream: null,
+	stream: null,
 });
 
 export const MeetingContextProvider = ({
@@ -33,65 +37,77 @@ export const MeetingContextProvider = ({
 }) => {
 	const { toast } = useToast();
 
-	// const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-	// const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+	const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+	const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+	const [stream, setStream] = useState<MediaStream | null>(null);
 	const [isVideoEnabled, setIsVideoEnabled] = useState(false);
 	const [isAudioEnabled, setIsAudioEnabled] = useState(false);
-	const [stream, setStream] = useState<MediaStream | null>(null);
-	// const [constraints, setConstraints] = useState<MediaStreamConstraints>({
-	// 	audio: false,
-	// 	video: false,
-	// });
 
-	const initializeStream = useCallback(async () => {
-		try {
-			const newStream = await navigator.mediaDevices.getUserMedia({
-				audio: true,
-				video: true,
-			});
-			setStream(newStream);
-		} catch (err) {
-			console.error("Error accessing media devices:", err);
-			toast({
-				title: "Error accessing media devices",
-				description: (err as Error).message,
-				variant: "destructive",
-			});
-		}
-	}, [toast]);
+	const getMedia = useCallback(
+		async (constraints: MediaStreamConstraints) => {
+			try {
+				return await navigator.mediaDevices.getUserMedia(constraints);
+			} catch (err) {
+				console.error("Error accessing media devices:", err);
+				toast({
+					title: "Error accessing media devices",
+					description: (err as Error).message,
+					variant: "destructive",
+				});
+				return null;
+			}
+		},
+		[toast]
+	);
 
-	const toggleAudio = useCallback(() => {
-		if (stream) {
-			const audioTrack = stream.getAudioTracks()[0];
-			audioTrack.enabled = !audioTrack.enabled;
-			setIsAudioEnabled(audioTrack.enabled);
+	const toggleAudio = useCallback(async () => {
+		if (audioStream) {
+			audioStream.getTracks().forEach((track) => track.stop());
+			setAudioStream(null);
+			setIsAudioEnabled(false);
+		} else {
+			const stream = await getMedia({ audio: true });
+			if (stream) {
+				setAudioStream(stream);
+				setIsAudioEnabled(true);
+			}
 		}
-	}, [stream]);
+	}, [audioStream, getMedia]);
 
-	const toggleVideo = useCallback(() => {
-		if (stream) {
-			const videoTrack = stream.getVideoTracks()[0];
-			videoTrack.enabled = !videoTrack.enabled;
-			setIsVideoEnabled(videoTrack.enabled);
+	const toggleVideo = useCallback(async () => {
+		if (videoStream) {
+			videoStream.getTracks().forEach((track) => track.stop());
+			setVideoStream(null);
+			setIsVideoEnabled(false);
+		} else {
+			const stream = await getMedia({ video: true });
+			if (stream) {
+				setVideoStream(stream);
+				setIsVideoEnabled(true);
+			}
 		}
-	}, [stream]);
+	}, [videoStream, getMedia]);
 
 	useEffect(() => {
-		initializeStream();
 		return () => {
-			if (stream) {
-				stream.getTracks().forEach((track) => track.stop());
+			if (audioStream) {
+				audioStream.getTracks().forEach((track) => track.stop());
+			}
+			if (videoStream) {
+				videoStream.getTracks().forEach((track) => track.stop());
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [initializeStream]);
+	}, []);
 
 	const returnValues: MeetingContextType = {
 		isVideoEnabled,
 		isAudioEnabled,
-		stream,
 		toggleAudio,
 		toggleVideo,
+		audioStream,
+		videoStream,
+		stream,
 	};
 
 	return (

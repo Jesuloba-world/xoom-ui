@@ -7,17 +7,24 @@ export interface meetingProps {}
 export interface meetingSetupProps extends meetingProps {}
 
 export const MeetingSetup = ({}: meetingSetupProps) => {
-	const { isAudioEnabled, isVideoEnabled, stream, toggleAudio, toggleVideo } =
-		useMeeting();
+	const {
+		isAudioEnabled,
+		isVideoEnabled,
+		toggleAudio,
+		toggleVideo,
+		audioStream,
+		videoStream,
+	} = useMeeting();
 
 	return (
 		<div className="flex h-screen w-full flex-col items-center justify-center gap-3 text-white">
 			<h1 className="text-2xl font-bold">Setup</h1>
 			<div>
-				{isVideoEnabled && stream ? (
+				{isVideoEnabled && videoStream ? (
 					<video
 						ref={(videoElement) => {
-							if (videoElement) videoElement.srcObject = stream;
+							if (videoElement)
+								videoElement.srcObject = videoStream;
 						}}
 						autoPlay
 						playsInline
@@ -29,9 +36,19 @@ export const MeetingSetup = ({}: meetingSetupProps) => {
 						<p>Camera is disabled</p>
 					</div>
 				)}
-				{/* <audio ref={audioRef} autoPlay playsInline muted /> */}
+				{isAudioEnabled && audioStream && (
+					<audio
+						ref={(audioElement) => {
+							if (audioElement)
+								audioElement.srcObject = audioStream;
+						}}
+						autoPlay
+						playsInline
+						muted
+					/>
+				)}
 			</div>
-			<div className="flex gap-6">
+			<div className="flex h-16 items-center justify-center gap-6">
 				<div className="flex justify-center items-center gap-2">
 					<span>Audio:</span>
 					<Switch
