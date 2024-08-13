@@ -37,7 +37,13 @@ export default function Meeting({
 	return (
 		<main className="h-screen w-full">
 			<MeetingContextProvider>
-				{!isSetupComplete ? <MeetingSetup /> : <MeetingRoom />}
+				{!isSetupComplete ? (
+					<MeetingSetup
+						joinMeeting={() => setIsSetupComplete(true)}
+					/>
+				) : (
+					<MeetingRoom meetingId={id} />
+				)}
 			</MeetingContextProvider>
 		</main>
 	);

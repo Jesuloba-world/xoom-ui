@@ -2,21 +2,15 @@ import { useEffect, useRef } from "react";
 import { Switch } from "./ui/switch";
 import { useMeeting } from "@/context/meetingContext";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
-export interface meetingProps {}
+export interface meetingSetupProps {
+	joinMeeting: () => void;
+}
 
-export interface meetingSetupProps extends meetingProps {}
-
-export const MeetingSetup = ({}: meetingSetupProps) => {
-	const {
-		isAudioEnabled,
-		isVideoEnabled,
-		toggleAudio,
-		toggleVideo,
-		// audioStream,
-		// videoStream,
-		stream,
-	} = useMeeting();
+export const MeetingSetup = ({ joinMeeting }: meetingSetupProps) => {
+	const { isAudioEnabled, isVideoEnabled, toggleAudio, toggleVideo, stream } =
+		useMeeting();
 
 	return (
 		<div className="flex h-screen w-full flex-col items-center justify-center gap-3 text-white">
@@ -54,7 +48,17 @@ export const MeetingSetup = ({}: meetingSetupProps) => {
 						onCheckedChange={(bool: boolean) => toggleVideo()}
 					/>
 				</div>
+				{/* Device settings */}
 			</div>
+			<Button
+				className="rounded-md bg-green-500 px-4 py-2.5 hover:bg-green-500/60"
+				onClick={() => {
+					// trigger the join meeting call
+					joinMeeting();
+				}}
+			>
+				Join Meeting
+			</Button>
 		</div>
 	);
 };

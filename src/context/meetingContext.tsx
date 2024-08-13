@@ -18,6 +18,11 @@ interface MeetingContextType {
 	stream: MediaStream | null;
 }
 
+interface Device {
+	id: string;
+	label: string;
+}
+
 const MeetingContext = createContext<MeetingContextType>({
 	isVideoEnabled: false,
 	isAudioEnabled: false,
@@ -36,6 +41,10 @@ export const MeetingContextProvider = ({
 	const [stream, setStream] = useState<MediaStream | null>(null);
 	const [isVideoEnabled, setIsVideoEnabled] = useState(false);
 	const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+	// const [audioInputDevices, setAudioInputDevices] = useState<Device[]>();
+	// const [videoInputDevices, setVideoInputDevices] = useState<Device[]>();
+
+	// TODO: work on device selection later
 
 	const getMedia = useCallback(
 		async (constraints: MediaStreamConstraints) => {
@@ -104,6 +113,20 @@ export const MeetingContextProvider = ({
 		}
 	}, [isVideoEnabled, stream, getMedia]);
 
+	// const updateDeviceList = useCallback(async () => {
+	// 	const devices = await navigator.mediaDevices.enumerateDevices();
+
+	// 	const audioDevices = devices
+	// 		.filter((device) => device.kind === "audioinput")
+	// 		.map((device) => ({ id: device.deviceId, label: device.label }));
+	// 	const videoDevices = devices
+	// 		.filter((device) => device.kind === "videoinput")
+	// 		.map((device) => ({ id: device.deviceId, label: device.label }));
+
+	// 	setAudioInputDevices(audioDevices);
+	// 	setVideoInputDevices(videoDevices);
+	// }, []);
+
 	useEffect(() => {
 		return () => {
 			if (stream) {
@@ -112,6 +135,21 @@ export const MeetingContextProvider = ({
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	// useEffect(() => {
+	// 	// set and update device list
+	// 	updateDeviceList();
+	// 	navigator.mediaDevices.addEventListener(
+	// 		"devicechange",
+	// 		updateDeviceList
+	// 	);
+	// 	return () => {
+	// 		navigator.mediaDevices.removeEventListener(
+	// 			"devicechange",
+	// 			updateDeviceList
+	// 		);
+	// 	};
+	// }, [updateDeviceList]);
 
 	const returnValues: MeetingContextType = {
 		isVideoEnabled,

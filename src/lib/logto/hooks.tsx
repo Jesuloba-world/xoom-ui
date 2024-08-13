@@ -1,7 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { onGetLogtoContext, onSignIn, onSignOut } from "./functions";
+import {
+	onGetAccessToken,
+	onGetLogtoContext,
+	onSignIn,
+	onSignOut,
+} from "./functions";
 import { IdTokenClaims, UserInfoResponse } from "@logto/next";
 
 type useLogtoType = () => {
@@ -42,4 +47,10 @@ const useGetLogtoContext = () =>
 	useQuery({
 		queryKey: ["logtoContext"],
 		queryFn: async () => await onGetLogtoContext({ fetchUserInfo: true }),
+	});
+
+export const useGetAccessToken = () =>
+	useQuery({
+		queryKey: ["accessToken"],
+		queryFn: async () => await onGetAccessToken(),
 	});
